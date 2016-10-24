@@ -22,7 +22,7 @@ class Scenario {
 		if(!this._isStart)
 			return;
 		this._nowTime = Date.now();
-		var duration = (this._nowTime - this._startTime) / 1000 * this._speed;
+		const duration = (this._nowTime - this._startTime) / 1000 * this._speed;
 		
 		if(duration > this._finishTime) {
 			this.finish(resolve, reject);
