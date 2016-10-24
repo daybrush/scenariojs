@@ -76,7 +76,6 @@ var Scenario = function () {
 			var distTime = 0;
 			for (var time in scenes) {
 				distTime = parseFloat(time) + scenes[time].getFinishTime() / scenes[time].getPlaySpeed();
-				console.log(distTime);
 				if (distTime > finishTime) finishTime = distTime;
 			}
 			this._finishTime = finishTime;
