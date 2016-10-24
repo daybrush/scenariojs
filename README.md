@@ -8,6 +8,9 @@ write code in ES6
 
 you can compile ES6 to ES5
 
+
+### EXAMPLE 
+
 ```javascript
 var scenario = new Scenario({
 	0 : scene1,
