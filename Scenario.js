@@ -54,7 +54,12 @@ class Scenario {
 		return this;
 		
 	};
-
+	initTime() {
+		const scenes = this.scenes;
+		for(let time in scenes) {
+			scenes[time].setTime(0);
+		}
+	}
 	initFinishTime(){
 		let finishTime = 0;
 		
@@ -71,8 +76,8 @@ class Scenario {
 	play() {
 		if(this._isStart)
 			return;
-			
 		this.initFinishTime();
+		this.initTime();
 		this._isStart = true;
 		const self = this;		
 		self._startTime =  Date.now();

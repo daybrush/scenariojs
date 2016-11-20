@@ -68,6 +68,14 @@ var Scenario = function () {
 			return this;
 		}
 	}, {
+		key: "initTime",
+		value: function initTime() {
+			var scenes = this.scenes;
+			for (var time in scenes) {
+				scenes[time].setTime(0);
+			}
+		}
+	}, {
 		key: "initFinishTime",
 		value: function initFinishTime() {
 			var finishTime = 0;
@@ -85,8 +93,8 @@ var Scenario = function () {
 		key: "play",
 		value: function play() {
 			if (this._isStart) return;
-
 			this.initFinishTime();
+			this.initTime();
 			this._isStart = true;
 			var self = this;
 			self._startTime = Date.now();
