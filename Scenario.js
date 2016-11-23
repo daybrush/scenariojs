@@ -2,16 +2,14 @@ class Scenario {
 
 	constructor(scenes = {}) {
 		this.scenes = scenes;
-		this._finishTime = 0;
 		this._startTime = 0;
 		this._nowTime = 0;
 		this._speed = 1;	
 		this._isStart = false;
+		this._finishCount = 0;
 	}
 	isFinish()  {
-		const distTime = this._nowTime - this._startTime;
-		
-		return distTime >= _finishTime;
+		return Object.keys(this.scenes).length <= this._finishCount
 	}
 	addScene(time, scene) {
 		this.scenes[time] = scene;
@@ -22,11 +20,11 @@ class Scenario {
 		if(!this._isStart)
 			return;
 		this._nowTime = Date.now();
-		const duration = (this._nowTime - this._startTime) / 1000 * this._speed;
+		const duration = (this._nowTime - this._startTime) / 1000 * this._speed
 		
-		if(duration > this._finishTime) {
-			this.finish(resolve, reject);
-			return;
+		if(this.isFinish()) {
+			this.finish(resolve, reject)
+			return
 		}
 		
 		
@@ -39,24 +37,32 @@ class Scenario {
 		
 		return;
 	}
-	setTime(_time) {
-		const scenes = this.scenes;
-		let distTime = 0;
+	setTime(_time, isPlay = false) {
+		const self = this
+		const scenes = this.scenes
+		let distTime = 0
 		for(let time in scenes) {
 			distTime = _time - time;
 			
 			if(distTime < 0)
 				continue;
 			
-			scenes[time].setTime(distTime);
+			if(!scenes[time].isFinish() && !scenes[time].isPlay()) {
+				
+				scenes[time].play({time:distTime}).then(()=>{self._finishCount++})
+				if(!isPlay)
+					scenes[time].stop();
+			}
 		}
 		
 		return this;
 		
 	};
 	initTime() {
-		const scenes = this.scenes;
+		this._finishCount = 0;
+		const scenes = this.scenes
 		for(let time in scenes) {
+			scenes[time].stop();
 			scenes[time].setTime(0);
 		}
 	}
