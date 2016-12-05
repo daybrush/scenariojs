@@ -11,19 +11,17 @@ var Scenario = function () {
 		_classCallCheck(this, Scenario);
 
 		this.scenes = scenes;
-		this._finishTime = 0;
 		this._startTime = 0;
 		this._nowTime = 0;
 		this._speed = 1;
 		this._isStart = false;
+		this._finishCount = 0;
 	}
 
 	_createClass(Scenario, [{
 		key: "isFinish",
 		value: function isFinish() {
-			var distTime = this._nowTime - this._startTime;
-
-			return distTime >= _finishTime;
+			return Object.keys(this.scenes).length <= this._finishCount;
 		}
 	}, {
 		key: "addScene",
@@ -38,12 +36,12 @@ var Scenario = function () {
 			this._nowTime = Date.now();
 			var duration = (this._nowTime - this._startTime) / 1000 * this._speed;
 
-			if (duration > this._finishTime) {
+			if (this.isFinish()) {
 				this.finish(resolve, reject);
 				return;
 			}
 
-			this.setTime(duration);
+			this.setTime(duration, true);
 
 			var self = this;
 			requestAnimFrame(function () {
@@ -55,6 +53,9 @@ var Scenario = function () {
 	}, {
 		key: "setTime",
 		value: function setTime(_time) {
+			var isPlay = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+			var self = this;
 			var scenes = this.scenes;
 			var distTime = 0;
 			for (var time in scenes) {
@@ -62,7 +63,13 @@ var Scenario = function () {
 
 				if (distTime < 0) continue;
 
-				scenes[time].setTime(distTime);
+				if (!scenes[time].isFinish() && !scenes[time].isPlay()) {
+
+					scenes[time].play({ time: distTime }).then(function () {
+						self._finishCount++;
+					});
+					if (!isPlay) scenes[time].stop();
+				}
 			}
 
 			return this;
@@ -70,8 +77,10 @@ var Scenario = function () {
 	}, {
 		key: "initTime",
 		value: function initTime() {
+			this._finishCount = 0;
 			var scenes = this.scenes;
 			for (var time in scenes) {
+				scenes[time].stop();
 				scenes[time].setTime(0);
 			}
 		}
