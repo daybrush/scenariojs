@@ -5,6 +5,17 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Scenario = function () {
+	/**
+     * create a Scenario
+     * @class
+     * @param {Object} [scenes=false] scenes.
+     * @example
+ var scenario = new Scenario({
+ 0 : scene1,
+ 0.4 : scene2,
+ 0.7 : scene3
+ });
+     */
 	function Scenario() {
 		var scenes = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
 
@@ -18,11 +29,30 @@ var Scenario = function () {
 		this._finishCount = 0;
 	}
 
+	/**
+     * Checks whether the scenario is finish.
+     * @return {Boolean} true : finish , false : not finish
+     */
+
+
 	_createClass(Scenario, [{
 		key: "isFinish",
 		value: function isFinish() {
 			return Object.keys(this.scenes).length <= this._finishCount;
 		}
+
+		/**
+      * Add Scene in time
+      * @param {number} time - Play Time.
+      * @param {Scene} Scene - Scene.
+      * @return {Scenario} An instance.
+      * @example
+  var scenario = new Scenario();
+  scenario.addScene(0, scene1);
+  scenario.addScene(0.5, scene2);
+  scenario.addScene(1, scene3);
+      */
+
 	}, {
 		key: "addScene",
 		value: function addScene(time, scene) {
@@ -50,6 +80,18 @@ var Scenario = function () {
 
 			return;
 		}
+		/**
+      * set Time in Scenario
+      * @param {number} time - Play Time.
+      * @param {Boolean} [isPlay=false] - Playing or Not Playing.
+      * @return {Scenario} An instance.
+      * @example
+  var scenario = new Scenario();
+  scenario.addScene(0, scene1);
+  scenario.addScene(0.5, scene2);
+  scenario.addScene(1, scene3);
+      */
+
 	}, {
 		key: "setTime",
 		value: function setTime(_time) {
@@ -75,35 +117,27 @@ var Scenario = function () {
 			return this;
 		}
 	}, {
-		key: "initTime",
-		value: function initTime() {
+		key: "init",
+		value: function init() {
 			this._finishCount = 0;
 			var scenes = this.scenes;
 			for (var time in scenes) {
 				scenes[time].stop();
 				scenes[time].setTime(0);
 			}
-		}
-	}, {
-		key: "initFinishTime",
-		value: function initFinishTime() {
-			var finishTime = 0;
-
-			var scenes = this.scenes;
-			var distTime = 0;
-			for (var time in scenes) {
-				distTime = parseFloat(time) + scenes[time].getFinishTime() / scenes[time].getPlaySpeed();
-				if (distTime > finishTime) finishTime = distTime;
-			}
-			this._finishTime = finishTime;
 			return this;
 		}
+
+		/**
+      * Play Scenario
+      * @return {Promise} Promise for playing state. <br/> if playing state is finish , call resolve.
+      */
+
 	}, {
 		key: "play",
 		value: function play() {
 			if (this._isStart) return;
-			this.initFinishTime();
-			this.initTime();
+			this.init();
 			this._isStart = true;
 			var self = this;
 			self._startTime = Date.now();
@@ -112,12 +146,20 @@ var Scenario = function () {
 				self.tick(resolve);
 			});
 		}
+		/**
+      * a Scenario is finish
+      * @param {Promise.resolve}[resolve=] if scenario is finish, call resolve function
+      * @return {Scenario} An instance.
+      */
+
 	}, {
 		key: "finish",
-		value: function finish(resolve, reject) {
+		value: function finish(resolve) {
 			this._isStart = false;
 
 			if (resolve) resolve();
+
+			return this;
 		}
 	}, {
 		key: "stop",
@@ -126,3 +168,4 @@ var Scenario = function () {
 
 	return Scenario;
 }();
+//# sourceMappingURL=Scenario.js.map

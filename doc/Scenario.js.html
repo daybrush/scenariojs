@@ -2,22 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: Scenario.js</title>
+    <title>Scenario.js - Documentation</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
 </head>
-
 <body>
 
-<div id="main">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-    <h1 class="page-title">Source: Scenario.js</h1>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Scenario.html">Scenario</a><ul class='methods'><li data-type='method'><a href="Scenario.html#addScene">addScene</a></li><li data-type='method'><a href="Scenario.html#finish">finish</a></li><li data-type='method'><a href="Scenario.html#isFinish">isFinish</a></li><li data-type='method'><a href="Scenario.html#play">play</a></li><li data-type='method'><a href="Scenario.html#setTime">setTime</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Scenario.js</h1>
+    
 
     
 
@@ -26,11 +37,17 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>/** Class representing a Scenario */
-class Scenario {
+            <pre class="prettyprint source linenums"><code>class Scenario {
 	/**
-     * Create a Scenario
-     * @param {Object} scenes - scenes.
+     * create a Scenario
+     * @class
+     * @param {Object} [scenes=false] scenes.
+     * @example
+var scenario = new Scenario({
+	0 : scene1,
+	0.4 : scene2,
+	0.7 : scene3
+});
      */
 	constructor(scenes = {}) {
 		this.scenes = scenes;
@@ -40,9 +57,26 @@ class Scenario {
 		this._isStart = false;
 		this._finishCount = 0;
 	}
+	
+	/**
+     * Checks whether the scenario is finish.
+     * @return {Boolean} true : finish , false : not finish
+     */
 	isFinish()  {
 		return Object.keys(this.scenes).length &lt;= this._finishCount
 	}
+	
+	/**
+     * Add Scene in time
+     * @param {number} time - Play Time.
+     * @param {Scene} Scene - Scene.
+     * @return {Scenario} An instance.
+     * @example
+var scenario = new Scenario();
+scenario.addScene(0, scene1);
+scenario.addScene(0.5, scene2);
+scenario.addScene(1, scene3);
+     */
 	addScene(time, scene) {
 		this.scenes[time] = scene;
 		return this;
@@ -69,6 +103,17 @@ class Scenario {
 		
 		return;
 	}
+	/**
+     * set Time in Scenario
+     * @param {number} time - Play Time.
+     * @param {Boolean} [isPlay=false] - Playing or Not Playing.
+     * @return {Scenario} An instance.
+     * @example
+var scenario = new Scenario();
+scenario.addScene(0, scene1);
+scenario.addScene(0.5, scene2);
+scenario.addScene(1, scene3);
+     */
 	setTime(_time, isPlay = false) {
 		const self = this
 		const scenes = this.scenes
@@ -90,32 +135,24 @@ class Scenario {
 		return this;
 		
 	};
-	initTime() {
+	init() {
 		this._finishCount = 0;
 		const scenes = this.scenes
 		for(let time in scenes) {
 			scenes[time].stop();
 			scenes[time].setTime(0);
 		}
-	}
-	initFinishTime(){
-		let finishTime = 0;
-		
-		const scenes = this.scenes;
-		let distTime = 0;
-		for(let time in scenes) {
-			distTime = parseFloat(time) + scenes[time].getFinishTime() / scenes[time].getPlaySpeed();
-			if(distTime > finishTime)
-				finishTime = distTime;
-		}
-		this._finishTime = finishTime;
 		return this;
 	}
+	
+	/**
+     * Play Scenario
+     * @return {Promise} Promise for playing state. &lt;br/> if playing state is finish , call resolve.
+     */
 	play() {
 		if(this._isStart)
 			return;
-		this.initFinishTime();
-		this.initTime();
+		this.init();
 		this._isStart = true;
 		const self = this;		
 		self._startTime =  Date.now();
@@ -124,11 +161,19 @@ class Scenario {
 			self.tick(resolve);
 		});
 	}
-	finish(resolve, reject) {
+	/**
+     * a Scenario is finish
+     * @param {Promise.resolve}[resolve=] if scenario is finish, call resolve function
+     * @return {Scenario} An instance.
+     */
+	finish(resolve) {
 		this._isStart = false;
 		
 		if(resolve)
 			resolve();
+			
+			
+		return this;
 	}
 	
 	stop() {
@@ -143,17 +188,13 @@ class Scenario {
 
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Scenario.html">Scenario</a></li></ul>
-</nav>
-
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Dec 05 2016 22:58:09 GMT+0900 (KST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Dec 06 2016 02:41:54 GMT+0900 (KST) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>

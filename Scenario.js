@@ -1,8 +1,14 @@
-/** Class representing a Scenario */
 class Scenario {
 	/**
-     * Create a Scenario
-     * @param {Object} scenes - scenes.
+     * create a Scenario
+     * @class
+     * @param {Object} [scenes=false] scenes.
+     * @example
+var scenario = new Scenario({
+	0 : scene1,
+	0.4 : scene2,
+	0.7 : scene3
+});
      */
 	constructor(scenes = {}) {
 		this.scenes = scenes;
@@ -12,9 +18,26 @@ class Scenario {
 		this._isStart = false;
 		this._finishCount = 0;
 	}
+	
+	/**
+     * Checks whether the scenario is finish.
+     * @return {Boolean} true : finish , false : not finish
+     */
 	isFinish()  {
 		return Object.keys(this.scenes).length <= this._finishCount
 	}
+	
+	/**
+     * Add Scene in time
+     * @param {number} time - Play Time.
+     * @param {Scene} Scene - Scene.
+     * @return {Scenario} An instance.
+     * @example
+var scenario = new Scenario();
+scenario.addScene(0, scene1);
+scenario.addScene(0.5, scene2);
+scenario.addScene(1, scene3);
+     */
 	addScene(time, scene) {
 		this.scenes[time] = scene;
 		return this;
@@ -41,6 +64,17 @@ class Scenario {
 		
 		return;
 	}
+	/**
+     * set Time in Scenario
+     * @param {number} time - Play Time.
+     * @param {Boolean} [isPlay=false] - Playing or Not Playing.
+     * @return {Scenario} An instance.
+     * @example
+var scenario = new Scenario();
+scenario.addScene(0, scene1);
+scenario.addScene(0.5, scene2);
+scenario.addScene(1, scene3);
+     */
 	setTime(_time, isPlay = false) {
 		const self = this
 		const scenes = this.scenes
@@ -62,32 +96,24 @@ class Scenario {
 		return this;
 		
 	};
-	initTime() {
+	init() {
 		this._finishCount = 0;
 		const scenes = this.scenes
 		for(let time in scenes) {
 			scenes[time].stop();
 			scenes[time].setTime(0);
 		}
-	}
-	initFinishTime(){
-		let finishTime = 0;
-		
-		const scenes = this.scenes;
-		let distTime = 0;
-		for(let time in scenes) {
-			distTime = parseFloat(time) + scenes[time].getFinishTime() / scenes[time].getPlaySpeed();
-			if(distTime > finishTime)
-				finishTime = distTime;
-		}
-		this._finishTime = finishTime;
 		return this;
 	}
+	
+	/**
+     * Play Scenario
+     * @return {Promise} Promise for playing state. <br/> if playing state is finish , call resolve.
+     */
 	play() {
 		if(this._isStart)
 			return;
-		this.initFinishTime();
-		this.initTime();
+		this.init();
 		this._isStart = true;
 		const self = this;		
 		self._startTime =  Date.now();
@@ -96,11 +122,19 @@ class Scenario {
 			self.tick(resolve);
 		});
 	}
-	finish(resolve, reject) {
+	/**
+     * a Scenario is finish
+     * @param {Promise.resolve}[resolve=] if scenario is finish, call resolve function
+     * @return {Scenario} An instance.
+     */
+	finish(resolve) {
 		this._isStart = false;
 		
 		if(resolve)
 			resolve();
+			
+			
+		return this;
 	}
 	
 	stop() {
